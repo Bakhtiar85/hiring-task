@@ -6,5 +6,6 @@ export type PayloadType = {
 
 export type CreateTitleType = {
   title: string;
+  subject: string;
   userId: UserEntity;
 };

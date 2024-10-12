@@ -13,3 +13,5 @@ titleRouter.post(
 );
 
 titleRouter.get("/", checkAuth, TitleController.readTitleController);
+
+titleRouter.delete("/:id", checkAuth, TitleController.deleteTitleController);

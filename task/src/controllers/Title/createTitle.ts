@@ -5,9 +5,9 @@ import { titleService } from "../../services";
 import { errorHandlerWrapper } from "../../utils";
 
 const createTitleHandler = async (req, res: Response) => {
-  const { title } = req.body;
+  const { title, subject } = req.body;
   const userId: UserEntity = req.user;
-  const newTitle = await titleService.createTitle({ title, userId });
+  const newTitle = await titleService.createTitle({ title, subject, userId });
   res.json(newTitle).status(httpStatus.CREATED);
 };
 

@@ -25,3 +25,25 @@ export const readTitle = async (uuid: string): Promise<TitleEntity[]> => {
     },
   });
 };
+
+export const deleteTitle = async (uuid: string): Promise<{ success: boolean; uuid: string }> => {
+  const titleRepository: Repository<TitleEntity> =
+    AppDataSouce.getRepository(TitleEntity);
+
+  // Find the title by its uuid
+  const title = await titleRepository.findOne({
+    where: {
+      uuid,
+    },
+  });
+
+  if (!title) {
+    throw new Error('Title not found');
+  }
+
+  // Remove the found title from the database
+  await titleRepository.remove(title);
+
+  // Return success true and the uuid
+  return { success: true, uuid };
+};

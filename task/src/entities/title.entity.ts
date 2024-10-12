@@ -10,6 +10,9 @@ export class TitleEntity extends CoreEntity {
   @Column({ type: "varchar", nullable: false})
   title: string;
 
+  @Column({ type: "varchar", nullable: false})
+  subject: string;
+
   @ManyToOne(() => UserEntity, (user) => user.uuid, { nullable: false})
   @JoinColumn({ name: 'userId' })
   userId: UserEntity;
