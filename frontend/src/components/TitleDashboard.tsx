@@ -14,6 +14,7 @@ const TitleDashboard: React.FC = () => {
     const [newTitle, setNewTitle] = useState("");
     const [newSubject, setNewSubject] = useState("");
     const [error, setError] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
     const [walletAddress, setWalletAddress] = useState<string | null>(null); // Store connected wallet address
     const navigate = useNavigate();
 
@@ -90,6 +91,7 @@ const TitleDashboard: React.FC = () => {
         try {
             await deleteTitle(titleId);
             setTitles(titles.filter((title) => title.uuid !== titleId));
+            setSuccessMsg("Title deleted successfully.");
         } catch (error: any) {
             setError("Failed to delete the title.");
         }
@@ -167,6 +169,7 @@ const TitleDashboard: React.FC = () => {
             ) : (
                 <p>No titles available. Add a new title above.</p>
             )}
+            {successMsg && <p className="success">{successMsg}</p>}
         </div>
     );
 };

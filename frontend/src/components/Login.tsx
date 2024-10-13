@@ -14,8 +14,8 @@ const Login: React.FC = () => {
 
         try {
             await loginUser({ email, password });
-            alert("Registration successful!");
-            // Optionally redirect to login or home
+            // Redirect to dashboard
+            navigate("/dashboard");
         } catch (error: any) {
             setError(error.message);
         }
