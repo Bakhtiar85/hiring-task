@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/authService";
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState("");
@@ -12,27 +13,9 @@ const Login: React.FC = () => {
         setError("");
 
         try {
-            const response = await fetch("http://localhost:8000/api/v1/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Login failed.");
-            }
-
-            const data = await response.json();
-            const token = data.token;
-
-            // Save token to localStorage
-            localStorage.setItem("token", token);
-
-            // Redirect to dashboard
-            navigate("/dashboard");
+            await loginUser({ email, password });
+            alert("Registration successful!");
+            // Optionally redirect to login or home
         } catch (error: any) {
             setError(error.message);
         }
