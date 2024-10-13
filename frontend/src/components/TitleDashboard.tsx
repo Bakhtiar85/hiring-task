@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchTitles, createTitle, deleteTitle } from "../services/titleService";
 import detectEthereumProvider from "@metamask/detect-provider";
+import { logOutUser } from "../services/authService";
 
 interface Title {
     uuid: string;
@@ -97,34 +98,46 @@ const TitleDashboard: React.FC = () => {
         }
     };
 
+    const handleLogOut = async () => {
+        logOutUser();
+        navigate("/login");
+    }
+
     return (
-        <div className="container">
-            <h2>Title Dashboard</h2>
+        <div className="containermx-auto p-8">
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-semibold">Title Dashboard</h2>
+                <button onClick={handleLogOut} type="button" className="bg-red-500/80 text-white px-2 py-1 rounded hover:bg-red-500/60">
+                    Logout
+                </button>
+            </div>
 
-            {error && <p className="error">{error}</p>}
+            {error && <p className="error text-red-500">{error}</p>}
 
-            {!walletAddress &&
-                <p className="error">Please connect your MetaMask wallet.</p>
-            }
-            <div className="wallet">
+            {!walletAddress && <p className="error text-red-500">Please connect your MetaMask wallet.</p>}
+            <div className="wallet mb-4">
                 {(!error && walletAddress) ? (
                     <>
                         <p>Connected Wallet: {walletAddress}</p>
-                        <button onClick={() => setWalletAddress(null)}>Disconnect Wallet</button>
+                        <button onClick={() => setWalletAddress(null)} className="mt-2 text-blue-500 underline">
+                            Disconnect Wallet
+                        </button>
                     </>
                 ) : (
-                    <button onClick={connectWallet}>Connect MetaMask</button>
+                    <button onClick={connectWallet} className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600">
+                        Connect MetaMask
+                    </button>
                 )}
             </div>
 
-
-            <form onSubmit={handleCreateTitle}>
+            <form onSubmit={handleCreateTitle} className="mb-6 space-y-4">
                 <input
                     type="text"
                     placeholder="New Title"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     required
+                    className="w-full p-2 border border-gray-300 rounded"
                 />
                 <input
                     type="text"
@@ -132,33 +145,38 @@ const TitleDashboard: React.FC = () => {
                     value={newSubject}
                     onChange={(e) => setNewSubject(e.target.value)}
                     required
+                    className="w-full p-2 border border-gray-300 rounded"
                 />
-                <button type="submit" disabled={!walletAddress}>
+                <button type="submit" className="w-full p-2 text-white bg-blue-500 rounded hover:bg-blue-600">
                     Add Title
                 </button>
             </form>
 
-            <h3>Your Titles</h3>
+            <h3 className="text-xl font-semibold">Your Titles</h3>
             {titles.length > 0 ? (
-                <table>
-                    <thead>
+                <table className="min-w-full bg-white border border-gray-300">
+                    <thead className="bg-gray-100">
                         <tr>
-                            <th>Sr. No</th>
-                            <th>UUID</th>
-                            <th>Title</th>
-                            <th>Subject</th>
-                            <th>Action</th>
+                            <th className="px-4 py-2 border-b text-left text-gray-600">Sr. No</th>
+                            <th className="px-4 py-2 border-b text-left text-gray-600">UUID</th>
+                            <th className="px-4 py-2 border-b text-left text-gray-600">Title</th>
+                            <th className="px-4 py-2 border-b text-left text-gray-600">Subject</th>
+                            <th className="px-4 py-2 border-b text-left text-gray-600">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {titles.map((title, index) => (
-                            <tr key={title.uuid}>
-                                <td>{index + 1}</td>
-                                <td>{title.uuid.slice(0, 4)}...</td>
-                                <td>{title.title || "N/A"}</td>
-                                <td>{title.subject || "N/A"}</td>
-                                <td>
-                                    <button disabled={!walletAddress} onClick={() => handleDeleteTitle(title.uuid)}>
+                            <tr key={title.uuid} className="hover:bg-gray-50">
+                                <td className="px-4 py-2 border-b">{index + 1}</td>
+                                <td className="px-4 py-2 border-b">{title.uuid.slice(0, 4)}...</td>
+                                <td className="px-4 py-2 border-b">{title.title || "N/A"}</td>
+                                <td className="px-4 py-2 border-b">{title.subject || "N/A"}</td>
+                                <td className="px-4 py-2 border-b">
+                                    <button
+                                        disabled={!walletAddress}
+                                        onClick={() => handleDeleteTitle(title.uuid)}
+                                        className={`px-2 py-1 text-white ${!walletAddress ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500'} rounded`}
+                                    >
                                         Delete
                                     </button>
                                 </td>
@@ -169,7 +187,7 @@ const TitleDashboard: React.FC = () => {
             ) : (
                 <p>No titles available. Add a new title above.</p>
             )}
-            {successMsg && <p className="success">{successMsg}</p>}
+            {successMsg && <p className="success mt-4 text-green-500">{successMsg}</p>}
         </div>
     );
 };

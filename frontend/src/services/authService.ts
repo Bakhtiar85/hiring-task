@@ -46,3 +46,8 @@ export const loginUser = async (data: LoginData) => {
     localStorage.setItem("token", token); // Store JWT in local storage
     return token;
 };
+
+export const logOutUser = async () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("walletAddress");
+}
