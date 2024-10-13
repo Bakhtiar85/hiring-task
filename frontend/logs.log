@@ -1,0 +1,13 @@
+
+> frontend@0.1.0 test
+> jest
+
+PASS __tests__/Login.test.tsx (13.049 s)
+PASS __tests__/Register.test.tsx (13.172 s)
+PASS __tests__/TitleDashboard.test.tsx (13.309 s)
+
+Test Suites: 3 passed, 3 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        14.561 s
+Ran all test suites.
