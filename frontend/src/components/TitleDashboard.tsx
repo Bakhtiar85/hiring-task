@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchTitles, createTitle, deleteTitle } from "../services/titleService";
+import detectEthereumProvider from "@metamask/detect-provider";
 
 interface Title {
     uuid: string;
@@ -13,13 +14,18 @@ const TitleDashboard: React.FC = () => {
     const [newTitle, setNewTitle] = useState("");
     const [newSubject, setNewSubject] = useState("");
     const [error, setError] = useState("");
+    const [walletAddress, setWalletAddress] = useState<string | null>(null); // Store connected wallet address
     const navigate = useNavigate();
 
     // Check for token and redirect if not found
     useEffect(() => {
         const token = localStorage.getItem("token");
+        const walletAddress = localStorage.getItem("walletAddress");
         if (!token) {
             navigate("/login");
+        }
+        if (walletAddress) {
+            setWalletAddress(walletAddress);
         }
     }, [navigate]);
 
@@ -36,9 +42,34 @@ const TitleDashboard: React.FC = () => {
         loadTitles();
     }, []);
 
+    // MetaMask connection logic
+    const connectWallet = async () => {
+        const provider: any = await detectEthereumProvider();
+
+        if (provider) {
+            try {
+                // Request wallet connection
+                const accounts = await provider.request({ method: "eth_requestAccounts" });
+                setWalletAddress(accounts[0]);
+
+                // Save walletAddress to localStorage
+                localStorage.setItem("walletAddress", accounts[0]);
+            } catch (err) {
+                setError("MetaMask connection failed.");
+            }
+        } else {
+            setError("MetaMask not detected. Please install MetaMask.");
+        }
+    };
+
     const handleCreateTitle = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+
+        if (!walletAddress) {
+            setError("Please connect your MetaMask wallet to add titles.");
+            return;
+        }
 
         try {
             const createdTitle = await createTitle({ title: newTitle, subject: newSubject });
@@ -51,6 +82,11 @@ const TitleDashboard: React.FC = () => {
     };
 
     const handleDeleteTitle = async (titleId: string) => {
+        if (!walletAddress) {
+            setError("Please connect your MetaMask wallet to delete titles.");
+            return;
+        }
+
         try {
             await deleteTitle(titleId);
             setTitles(titles.filter((title) => title.uuid !== titleId));
@@ -65,6 +101,21 @@ const TitleDashboard: React.FC = () => {
 
             {error && <p className="error">{error}</p>}
 
+            {!walletAddress &&
+                <p className="error">Please connect your MetaMask wallet.</p>
+            }
+            <div className="wallet">
+                {(!error && walletAddress) ? (
+                    <>
+                        <p>Connected Wallet: {walletAddress}</p>
+                        <button onClick={() => setWalletAddress(null)}>Disconnect Wallet</button>
+                    </>
+                ) : (
+                    <button onClick={connectWallet}>Connect MetaMask</button>
+                )}
+            </div>
+
+
             <form onSubmit={handleCreateTitle}>
                 <input
                     type="text"
@@ -75,35 +126,44 @@ const TitleDashboard: React.FC = () => {
                 />
                 <input
                     type="text"
-                    placeholder="Title's subject"
+                    placeholder="Subject"
                     value={newSubject}
                     onChange={(e) => setNewSubject(e.target.value)}
                     required
                 />
-                <button type="submit">Add Title</button>
+                <button type="submit" disabled={!walletAddress}>
+                    Add Title
+                </button>
             </form>
 
             <h3>Your Titles</h3>
             {titles.length > 0 ? (
-                <ul>
-                    {titles.map((title) => (
-                        <li key={title.uuid}>
-                            {
-                                title.title &&
-                                <div>
-                                    <strong>Title: </strong> <span>{title.title}</span>
-                                </div>
-                            }
-                            {
-                                title.subject &&
-                                <div>
-                                    <strong>Subject: </strong><span>{title.subject}</span>
-                                </div>
-                            }
-                            <button onClick={() => handleDeleteTitle(title.uuid)}>Delete</button>
-                        </li>
-                    ))}
-                </ul>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>UUID</th>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {titles.map((title, index) => (
+                            <tr key={title.uuid}>
+                                <td>{index + 1}</td>
+                                <td>{title.uuid.slice(0, 4)}...</td>
+                                <td>{title.title || "N/A"}</td>
+                                <td>{title.subject || "N/A"}</td>
+                                <td>
+                                    <button disabled={!walletAddress} onClick={() => handleDeleteTitle(title.uuid)}>
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             ) : (
                 <p>No titles available. Add a new title above.</p>
             )}
