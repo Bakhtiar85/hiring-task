@@ -7,8 +7,4 @@ module.exports = {
         '\\.(css|less|scss)$': 'identity-obj-proxy', // Mock CSS imports
     },
     setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'], // Optional, in case you have a setup file for Jest
-    testPathIgnorePatterns: [
-        '<rootDir>/__tests__/authService.test.ts',
-        '<rootDir>/__tests__/titleService.test.ts',
-    ],
 };

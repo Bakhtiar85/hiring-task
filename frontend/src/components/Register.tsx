@@ -6,6 +6,7 @@ const Register: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -13,7 +14,7 @@ const Register: React.FC = () => {
 
         try {
             await registerUser({ username, email, password });
-            alert("Registration successful!");
+            setSuccessMsg("Registration successful!");
             // Optionally redirect to login or home
         } catch (error: any) {
             setError(error.message);
@@ -48,6 +49,7 @@ const Register: React.FC = () => {
                 />
                 <button type="submit">Register</button>
             </form>
+            {successMsg && <p className="success">{successMsg}</p>}
         </div>
     );
 };
